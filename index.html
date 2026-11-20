@@ -512,6 +512,16 @@ main{gap:12px}
 .io{padding:14px;display:flex;flex-direction:column;gap:10px}
 .io p{margin:0}
 .io textarea{font-family:var(--mono);font-size:.72rem;resize:vertical}
+.lvhero{display:grid;grid-template-columns:46% minmax(0,1fr);align-items:end;background:#000;overflow:hidden;min-height:250px}
+.lvhero img{display:block;width:100%;max-height:300px;object-fit:contain;object-position:left bottom}
+.lvh-t{display:flex;flex-direction:column;gap:8px;padding:18px 16px 18px 4px;align-self:center;min-width:0}
+.lvh-t h2{font-family:var(--display);font-size:clamp(1.6rem,7vw,2.1rem);font-weight:700;line-height:1;margin:0}
+.lvh-t .xpbar{height:6px;margin-top:4px}
+.lvh-s{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.lvh-s div{display:flex;flex-direction:column;padding:8px 10px;border-radius:12px;background:var(--surface-2)}
+.lvh-s b{font-family:var(--display);font-size:1.05rem}
+.lvh-s small{font-size:.64rem;color:var(--muted)}
+.lvh-t p{margin:2px 0 0;font-size:.78rem;color:var(--muted);font-style:italic}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -764,7 +774,7 @@ const IMG64={forge:"UklGRkbWAABXRUJQVlA4WAoAAAAQAAAAtwEAkQMAQUxQSERcAAABFAZtG0ma
 for(const k in IMG64){try{const b=atob(IMG64[k]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);IMG[k]=URL.createObjectURL(new Blob([u],{type:IMG64[k].startsWith("UklG")?"image/webp":"image/jpeg"}))}catch(e){IMG[k]="data:image/"+(IMG64[k].startsWith("UklG")?"webp":"jpeg")+";base64,"+IMG64[k]}}
 const ZONES={
  front:[["schulter","e",245,372,54,64,-15],["schulter","e",642,372,54,64,15],["brust","e",372,392,74,54,8],["brust","e",515,392,74,54,-8],["bizeps","e",228,500,32,64,12],["bizeps","e",660,500,32,64,-12],["bauch","e",447,540,54,110,0],["bauch","e",350,560,28,68,-8],["bauch","e",545,560,28,68,8],["quads","e",345,905,64,145,-6],["quads","e",543,905,64,145,6],["waden","e",292,1270,38,102,-4],["waden","e",578,1270,38,102,4]],
- back:[["oben","p","M443 222 L328 300 L360 352 L443 565 L526 352 L558 300 Z"],["oben","e",352,430,50,44,0],["oben","e",535,430,50,44,0],["hinten","e",248,375,48,50,-15],["hinten","e",640,375,48,50,15],["lat","e",330,515,48,118,14],["lat","e",556,515,48,118,-14],["trizeps","e",222,505,36,76,10],["trizeps","e",668,505,36,76,-10],["lowback","e",419,610,24,72,0],["lowback","e",467,610,24,72,0],["ham","e",350,975,60,128,-4],["ham","e",538,975,60,128,4],["waden","e",297,1255,48,102,-3],["waden","e",578,1255,48,102,3]]};
+ back:[["oben","p","M443 222 L328 300 L360 352 L443 565 L526 352 L558 300 Z"],["oben","e",352,430,50,44,0],["oben","e",535,430,50,44,0],["hinten","e",248,375,48,50,-15],["hinten","e",640,375,48,50,15],["lat","p","M292 425 C298 500 322 580 352 635 C380 655 410 665 436 668 C425 600 410 530 400 480 C365 455 325 435 292 425 Z"],["lat","p","M594 425 C588 500 564 580 534 635 C506 655 476 665 450 668 C461 600 476 530 486 480 C521 455 561 435 594 425 Z"],["trizeps","e",222,505,36,76,10],["trizeps","e",668,505,36,76,-10],["lowback","e",419,610,24,72,0],["lowback","e",467,610,24,72,0],["ham","e",350,975,60,128,-4],["ham","e",538,975,60,128,4],["waden","e",297,1255,48,102,-3],["waden","e",578,1255,48,102,3]]};
 const BODY={front:ZONES.front.map(z=>[z[0]]),back:ZONES.back.map(z=>[z[0]])};
 function bodySvg(view,stat,{w=200,hl=null,tap=true,img=""}={}){
   let z="";ZONES[view].forEach(r=>{const g=r[0];let cls=hl?(hl.includes(g)?"ok":"off"):(stat[g]||"none");if(!hl&&cls==="none"&&FOCUS.has(g))cls="focus";if(!hl&&ui.muscle===g)cls="sel";if(!tap||hl)cls+=" off";
@@ -956,7 +966,7 @@ function vKoerper(){
 
 function vErfolge(){
   const L=levelInfo(),B=badges(),ks=Object.keys(weeks).sort();
-  let h=`<section class="card levelcard">${avatar(L,84)}<div><span class="eyebrow">Level ${L.level}</span><h2>${L.title}</h2><div class="muted small num" style="margin:4px 0 8px">${de(L.xp)} XP gesamt · noch ${de(L.need-L.into)} bis Level ${L.level+1}</div><div class="xpbar"><i style="width:${L.pct}%"></i></div></div></section>`;
+  let h=`<section class="card lvhero"><img src="${IMG.forge}" alt=""><div class="lvh-t"><span class="eyebrow">Level ${L.level}</span><h2>${L.title}</h2><div class="xpbar"><i style="width:${L.pct}%"></i></div><div class="muted small num">${de(L.into)} / ${de(L.need)} XP · ${de(L.xp)} gesamt</div><div class="lvh-s"><div><b class="num">${weekStreak()}</b><small>Wochen-Streak</small></div><div><b class="num">${B.filter(b=>b.on).length}/${B.length}</b><small>Badges</small></div></div><p>Du bist Bildhauer und Stein zugleich.</p></div></section>`;
   h+=`<section class="sec"><div class="sec-h"><h2>Badges</h2><span>${B.filter(b=>b.on).length} von ${B.length}</span></div><div class="badges">${B.map(b=>`<div class="bdg ${b.on?"on":""}"><span class="hex">${ic(b.p,20,2)}</span><b>${b.n}</b><small>${b.d}</small></div>`).join("")}</div></section>`;
   const per={};ks.forEach(k=>setsOf(weeks[k]).forEach(s=>{(per[s.ex]??={})[k]=Math.max(per[s.ex][k]||0,score(s.kg,s.reps));(per[s.ex].__s??=[]).push(s)}));
   const exs=Object.keys(per);
@@ -1165,6 +1175,6 @@ fromHash();selectWeek();render();
 })();
 </script>
 
-<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=3f3a6fcc").catch(()=>{}));</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=032e841a").catch(()=>{}));</script>
 </body>
 </html>
