@@ -522,6 +522,12 @@ main{gap:12px}
 .lvh-s b{font-family:var(--display);font-size:1.05rem}
 .lvh-s small{font-size:.64rem;color:var(--muted)}
 .lvh-t p{margin:2px 0 0;font-size:.78rem;color:var(--muted);font-style:italic}
+.top3{display:flex;flex-direction:column;gap:12px;min-height:calc(100svh - var(--top3-off,190px))}
+.banner.big{flex:1 1 auto;grid-template-columns:50% minmax(0,1fr);align-items:stretch;min-height:200px;position:relative}
+.banner.big img{max-height:none;width:100%;height:100%;position:absolute;left:0;top:0;width:50%;object-fit:contain;object-position:left center;padding:8px 0 8px 6px;width:54%}
+.banner.big .txt{grid-column:2;align-self:center;padding:16px 16px 16px 4px;gap:6px}
+.banner.big h1{font-size:clamp(1.7rem,8vw,2.3rem);font-weight:700;line-height:1;margin:0}
+.banner.big p{font-size:.95rem;line-height:1.35;margin-top:4px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -814,12 +820,12 @@ const QUOTES=[
 function dailyQuote(){const d=new Date(),n=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);return QUOTES[n%QUOTES.length]}
 function vHeute(){
   const L=levelInfo(),pr=progress(state),rec=nextSession(),cur=isCurWeek(),ti=ui.day??(cur?todayIdx():0),v=state.days[ti]||{},streak=weekStreak(),q=dailyQuote();
-  let h=`<section class="card banner"><img src="${IMG[q[0]]}" alt=""><div class="txt"><small>${greet()}, Valentin</small><p>${esc(q[1])}</p>${q[2]?`<small class="qa">${esc(q[2])}</small>`:""}</div></section>`;
+  let h=`<div class="top3"><section class="card banner big"><img src="${IMG.sis}" alt=""><div class="txt"><small>${greet()}</small><h1>Valentin</h1><p>${esc(q[1])}</p>${q[2]?`<small class="qa">${esc(q[2])}</small>`:""}</div></section>`;
   if(rec){const mus=[...new Set(rec.p.slots.flatMap((_,i)=>exMus(slotEx(state,rec.p.id,i))))];const sp=sessProg(state,rec.p);
     h+=`<section class="card hero"><div><span class="eyebrow">${sp.n?"Weitermachen":"Empfohlen"}</span><h2>Gym ${rec.p.id} · ${rec.p.n}</h2><p>${rec.p.slots.length} Übungen · ca. ${rec.p.slots.length*7} Min${rec.gains.length?` · bringt ${rec.gains.map(k=>MGN[k]).join(", ")}`:""}</p><button class="btn neon-btn" data-act="startLive" data-sid="${rec.p.id}">${ic(P.play,16)}${sp.n?"Fortsetzen":"Workout starten"}</button></div>${bodySvg(frontish(mus)&&!mus.includes("lat")?"front":"back",{}, {w:62,hl:mus})}</section>`}
   else h+=`<section class="card hero"><div><span class="eyebrow">Woche</span><h2>Alle Gym-Tage erledigt</h2><p>Stark. Jetzt Regeneration, Protein und Schlaf.</p></div>${bodySvg("front",muscleStatus(state),{w:62,tap:false})}</section>`;
   h+=`<section class="card wkc"><button class="wk-top" data-act="tab" data-k="erfolge" aria-label="Level ${L.level}, zu den Erfolgen">${avatar(L,34)}<div class="wk-l"><b>Level ${L.level} · ${L.title}</b><div class="xpbar"><i style="width:${L.pct}%"></i></div><small class="num">${de(L.into)} / ${de(L.need)} XP</small></div><div class="wk-s"><span title="Wochen-Streak"><i style="color:#ff6359">${ic(P.flame,15)}</i>${streak}</span><b class="num">${pr.pct}%</b><small>Woche</small></div></button>
-    <div class="wdots">${DAYS.map((d,i)=>{const on=dayActive(state,i);return `<button class="wdot ${on?"on":""} ${cur&&i===todayIdx()?"today":""}" data-act="daySheet" data-i="${i}" aria-label="${d}: Tagesübersicht"><i>${on?ic(P.check,12,3):""}</i>${d}</button>`}).join("")}</div></section>`;
+    <div class="wdots">${DAYS.map((d,i)=>{const on=dayActive(state,i);return `<button class="wdot ${on?"on":""} ${cur&&i===todayIdx()?"today":""}" data-act="daySheet" data-i="${i}" aria-label="${d}: Tagesübersicht"><i>${on?ic(P.check,12,3):""}</i>${d}</button>`}).join("")}</div></section></div>`;
   const gap=Math.max(0,T.protein-(v.protein||0));
   h+=`<section class="sec" id="metrics"><div class="sec-h"><h2>${cur&&ti===todayIdx()?"Heute":DAYS[ti]}</h2>${cur&&ti!==todayIdx()?`<button class="linkbtn" data-act="dayReset">Zurück zu heute</button>`:`<button class="linkbtn" data-act="gesund">Gesundheit ›</button>`}</div>
    <div class="card"><div class="pr2">${ring(Math.round((v.protein||0)/T.protein*100),52,6,`<b style="font-size:.82rem">${v.protein||0}</b>`)}<div class="pr2-m"><b>Protein</b><small>${gap?`noch ${gap} g bis ${T.protein} g`:"Ziel erreicht"}</small></div><div class="quick">${[10,20,30].map(n=>`<button data-act="prot" data-n="${n}" data-day="${ti}">+${n}</button>`).join("")}<input class="field" id="h-protein" data-f="day" data-day="${ti}" data-k="protein" type="number" inputmode="numeric" step="5" placeholder="g" value="${v.protein??""}" aria-label="Protein exakt in Gramm"></div></div>
@@ -1058,12 +1064,15 @@ function renderDaySheet(){const i=ui.dsheet;if(i==null)return;const dt=new Date(
 /* ===== Render ===== */
 const TABS=[["heute","Heute",P.home],["training","Training",P.dumb],null,["koerper","Körper",P.body],["erfolge","Erfolge",P.trophy]];
 function renderTabs(){$("tabs").innerHTML=TABS.map(t=>t?`<button class="tab" data-act="tab" data-k="${t[0]}" ${ui.tab===t[0]?'aria-current="page"':""}>${ic(t[2],22)}${t[1]}</button>`:`<button class="fab" data-act="fab" aria-label="Workout starten">${ic(P.play,24)}</button>`).join("");$("wissenBtn").classList.toggle("on",ui.tab==="wissen")}
+function fitTop(){try{const hb=document.querySelector(".appbar")?.getBoundingClientRect().bottom||70,tb=document.querySelector(".tabbar");const tt=tb?tb.getBoundingClientRect().top:innerHeight-100;document.documentElement.style.setProperty("--top3-off",Math.round(hb+(innerHeight-tt)+18)+"px")}catch(e){}}
+addEventListener("resize",fitTop);
 function render(){
   const aid=document.activeElement?.id;
   const {w}=isoWeek(monday),end=new Date(monday);end.setDate(end.getDate()+6);
   $("wkLabel").textContent=`KW ${w}`;$("wkRange").textContent=isCurWeek()?"aktuell":`${fmtD(monday)}–${fmtD(end)}`;
   renderTabs();
   $("view").innerHTML=!loaded?`<div class="empty">Lädt deine Daten …</div>`:({heute:vHeute,training:vTraining,koerper:vKoerper,erfolge:vErfolge,wissen:vWissen}[ui.tab]||vHeute)();
+  fitTop();
   if(live)renderLive();
   if(ui.dsheet!=null&&!$("dsheet").hidden)renderDaySheet();
   if(aid){const el=document.getElementById(aid);if(el&&(el.closest("#view")||el.closest("#live")))el.focus({preventScroll:true})}
@@ -1175,6 +1184,6 @@ fromHash();selectWeek();render();
 })();
 </script>
 
-<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=032e841a").catch(()=>{}));</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=d5da6d66").catch(()=>{}));</script>
 </body>
 </html>
